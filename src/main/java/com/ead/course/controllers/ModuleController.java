@@ -53,7 +53,7 @@ public class ModuleController {
     }
 
     @DeleteMapping("/{moduleId}")
-    public ResponseEntity<String> deleteCourse(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
+    public ResponseEntity<String> deleteModule(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
         Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
         if (moduleModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MODULE_NOT_FOUND_FOR_THIS_COURSE);
