@@ -1,10 +1,15 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.CourseDto;
+import com.ead.course.filters.CourseFilter;
 import com.ead.course.models.CourseModel;
 import com.ead.course.services.CourseService;
+import com.ead.course.specifications.CourseSpecs;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,8 +70,9 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseModel>> getAllCourses() {
-        return ResponseEntity.ok(courseService.findAll());
+    public ResponseEntity<Page<CourseModel>> getAllCourses(CourseFilter filter,
+                                                           @PageableDefault(sort = "courseId") Pageable pageable) {
+        return ResponseEntity.ok(courseService.findAll(CourseSpecs.usandoFiltro(filter), pageable));
     }
 
     @GetMapping("/{courseId}")
