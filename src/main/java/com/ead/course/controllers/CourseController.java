@@ -72,7 +72,7 @@ public class CourseController {
     @GetMapping
     public ResponseEntity<Page<CourseModel>> getAllCourses(CourseFilter filter,
                                                            @PageableDefault(sort = "courseId") Pageable pageable) {
-        return ResponseEntity.ok(courseService.findAll(CourseSpecs.usandoFiltro(filter), pageable));
+        return ResponseEntity.ok(courseService.findAll(CourseSpecs.usingFilter(filter), pageable));
     }
 
     @GetMapping("/{courseId}")

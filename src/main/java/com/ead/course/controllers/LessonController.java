@@ -1,12 +1,17 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.LessonDto;
+import com.ead.course.filters.LessonFilter;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
+import com.ead.course.specifications.CourseSpecs;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -79,8 +83,10 @@ public class LessonController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LessonModel>> getAllLessons(@PathVariable UUID moduleId) {
-        return ResponseEntity.ok(lessonService.findAllByModule(moduleId));
+    public ResponseEntity<Page<LessonModel>> getAllLessons(@PathVariable UUID moduleId, LessonFilter filter,
+                                                           @PageableDefault(sort = "lessonId") Pageable pageable) {
+        return ResponseEntity.ok(lessonService.findAll(CourseSpecs.lessonModuleId(moduleId)
+                .and(CourseSpecs.usingFilter(filter)), pageable));
     }
 
     @GetMapping("/{lessonId}")
