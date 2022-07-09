@@ -1,6 +1,5 @@
 package com.ead.course.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -43,7 +42,6 @@ public class ModuleModel implements Serializable {
 
     @CreationTimestamp
     @Column(nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime creationDate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
