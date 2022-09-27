@@ -10,6 +10,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -82,8 +85,15 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<Page<CourseModel>> getAllCourses(CourseFilter filter,
-                                                           @PageableDefault(sort = "courseId") Pageable pageable) {
-        return ResponseEntity.ok(courseService.findAll(CourseSpecs.usingFilter(filter), pageable));
+                                                           @PageableDefault(sort = "courseId") Pageable pageable,
+                                                           @RequestParam(required = false) UUID userId) {
+        Specification<CourseModel> specification = CourseSpecs.usingFilter(filter);
+
+        if (Objects.nonNull(userId)) {
+            specification = specification.and(CourseSpecs.courseUserId(userId));
+        }
+
+        return ResponseEntity.ok(courseService.findAll(specification, pageable));
     }
 
     @GetMapping("/{courseId}")

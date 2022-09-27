@@ -4,6 +4,7 @@ import com.ead.course.filters.CourseFilter;
 import com.ead.course.filters.LessonFilter;
 import com.ead.course.filters.ModuleFilter;
 import com.ead.course.models.CourseModel;
+import com.ead.course.models.CourseUserModel;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
 import lombok.AccessLevel;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -36,6 +38,14 @@ public class CourseSpecs {
             }
 
             return builder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<CourseModel> courseUserId(final UUID userId) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+            Join<CourseModel, CourseUserModel> join = root.join("coursesUsers");
+            return builder.equal(join.get("userId"), userId);
         };
     }
 
