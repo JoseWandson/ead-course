@@ -14,7 +14,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +32,6 @@ import java.util.UUID;
 @Log4j2
 @RestController
 @RequestMapping("/courses")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class CourseController {
 
     private static final String COURSE_NOT_FOUND = "Course Not Found.";
