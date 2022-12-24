@@ -5,6 +5,7 @@ import com.ead.course.filters.CourseFilter;
 import com.ead.course.models.CourseModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.specifications.CourseSpecs;
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,10 +97,8 @@ public class CourseController {
     @GetMapping("/{courseId}")
     public ResponseEntity<Object> getOneCourse(@PathVariable UUID courseId) {
         Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
-        if (courseModelOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(COURSE_NOT_FOUND);
-        }
 
-        return ResponseEntity.ok(courseModelOptional.get());
+        return courseModelOptional.<ResponseEntity<Object>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(COURSE_NOT_FOUND));
     }
 }

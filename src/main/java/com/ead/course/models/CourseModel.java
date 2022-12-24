@@ -4,20 +4,20 @@ import com.ead.course.enums.CourseLevel;
 import com.ead.course.enums.CourseStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -73,4 +73,8 @@ public class CourseModel implements Serializable {
     @OneToMany(mappedBy = "course")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<CourseUserModel> coursesUsers;
+
+    public CourseUserModel convertToCourseUserModel(UUID userId) {
+        return new CourseUserModel(null, this, userId);
+    }
 }
