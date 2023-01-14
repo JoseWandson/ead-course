@@ -1,9 +1,11 @@
 package com.ead.course.controllers;
 
-import com.ead.course.clients.CourseClient;
+import com.ead.course.clients.AuthUserClient;
 import com.ead.course.dtos.SubscriptionDto;
 import com.ead.course.dtos.UserDto;
+import com.ead.course.enums.UserStatus;
 import com.ead.course.models.CourseModel;
+import com.ead.course.models.CourseUserModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.services.CourseUserService;
 import jakarta.validation.Valid;
@@ -19,7 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpStatusCodeException;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,7 +32,7 @@ import java.util.UUID;
 public class CourseUserController {
 
     @Autowired
-    private CourseClient courseClient;
+    private AuthUserClient authUserClient;
 
     @Autowired
     private CourseService courseService;
@@ -39,7 +43,7 @@ public class CourseUserController {
     @GetMapping
     public ResponseEntity<Page<UserDto>> getAllUsersByCourse(@PageableDefault(sort = "userId") Pageable pageable,
                                                              @PathVariable UUID courseId) {
-        return ResponseEntity.ok(courseClient.getAllUsersByCourse(courseId, pageable));
+        return ResponseEntity.ok(authUserClient.getAllUsersByCourse(courseId, pageable));
     }
 
     @PostMapping("/subscription")
@@ -56,8 +60,19 @@ public class CourseUserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: subscription alredy exists!");
         }
 
-        courseUserService.save(courseModel.convertToCourseUserModel(userId));
+        try {
+            ResponseEntity<UserDto> responseUser = authUserClient.getOneUserById(subscriptionDto.getUserId());
+            if (Objects.requireNonNull(responseUser.getBody()).getUserStatus().equals(UserStatus.BLOCKED)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("User is bloqued.");
+            }
+        } catch (HttpStatusCodeException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            }
+        }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Subscription created successfully.");
+        CourseUserModel courseUserModel = courseUserService.save(courseModel.convertToCourseUserModel(userId));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseUserModel);
     }
 }
