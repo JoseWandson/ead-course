@@ -10,7 +10,6 @@ import com.ead.course.services.CourseService;
 import com.ead.course.services.CourseUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -41,8 +40,13 @@ public class CourseUserController {
     private CourseUserService courseUserService;
 
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAllUsersByCourse(@PageableDefault(sort = "userId") Pageable pageable,
-                                                             @PathVariable UUID courseId) {
+    public ResponseEntity<Object> getAllUsersByCourse(@PageableDefault(sort = "userId") Pageable pageable,
+                                                      @PathVariable UUID courseId) {
+        Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
+        if (courseModelOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course Not Found.");
+        }
+
         return ResponseEntity.ok(authUserClient.getAllUsersByCourse(courseId, pageable));
     }
 
