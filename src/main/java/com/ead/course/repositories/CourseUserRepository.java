@@ -12,6 +12,10 @@ public interface CourseUserRepository extends JpaRepository<CourseUserModel, UUI
 
     boolean existsByCourseAndUserId(CourseModel courseModel, UUID userId);
 
+    boolean existsByUserId(UUID userId);
+
     @Query("select c from CourseUserModel c where c.course.courseId = :courseId")
     List<CourseUserModel> findAllCourseUserIntoCourse(UUID courseId);
+
+    void deleteAllByUserId(UUID userId);
 }

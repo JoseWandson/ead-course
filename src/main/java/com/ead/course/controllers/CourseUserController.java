@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/courses/{courseId}/users")
+@RequestMapping("/courses/")
 public class CourseUserController {
 
     @Autowired
@@ -39,7 +40,7 @@ public class CourseUserController {
     @Autowired
     private CourseUserService courseUserService;
 
-    @GetMapping
+    @GetMapping("{courseId}/users")
     public ResponseEntity<Object> getAllUsersByCourse(@PageableDefault(sort = "userId") Pageable pageable,
                                                       @PathVariable UUID courseId) {
         Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
@@ -50,7 +51,7 @@ public class CourseUserController {
         return ResponseEntity.ok(authUserClient.getAllUsersByCourse(courseId, pageable));
     }
 
-    @PostMapping("/subscription")
+    @PostMapping("{courseId}/users/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable UUID courseId,
                                                                @RequestBody @Valid SubscriptionDto subscriptionDto) {
         Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
@@ -78,5 +79,16 @@ public class CourseUserController {
         CourseUserModel courseUserModel = courseUserService.saveAndSendSubscriptionUserInCourse(courseModel.convertToCourseUserModel(userId));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(courseUserModel);
+    }
+
+    @DeleteMapping("users/{userId}")
+    public ResponseEntity<Object> deleteCourseUserByUser(@PathVariable UUID userId) {
+        if (!courseUserService.existsByUserId(userId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CourseUser not found.");
+        }
+
+        courseUserService.deleteCourseUserByUser(userId);
+
+        return ResponseEntity.ok("CourseUser deleted successfully.");
     }
 }
