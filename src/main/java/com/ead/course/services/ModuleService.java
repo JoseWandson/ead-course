@@ -19,4 +19,6 @@ public interface ModuleService {
     Page<ModuleModel> findAll(Specification<ModuleModel> spec, Pageable pageable);
 
     Optional<ModuleModel> findById(UUID moduleId);
+
+    Page<ModuleModel> findAllByCourse(Specification<ModuleModel> spec, Pageable pageable);
 }

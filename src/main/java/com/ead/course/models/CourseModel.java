@@ -69,12 +69,4 @@ public class CourseModel implements Serializable {
     @OneToMany(mappedBy = "course")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ModuleModel> modules;
-
-    @OneToMany(mappedBy = "course")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Set<CourseUserModel> coursesUsers;
-
-    public CourseUserModel convertToCourseUserModel(UUID userId) {
-        return new CourseUserModel(null, this, userId);
-    }
 }

@@ -16,4 +16,6 @@ public interface LessonService {
     void delete(LessonModel lessonModel);
 
     Page<LessonModel> findAll(Specification<LessonModel> spec, Pageable pageable);
+
+    Page<LessonModel> findAllByModule(Specification<LessonModel> spec, Pageable pageable);
 }

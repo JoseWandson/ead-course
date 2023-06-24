@@ -1,18 +1,16 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.CourseDto;
-import com.ead.course.filters.CourseFilter;
 import com.ead.course.models.CourseModel;
 import com.ead.course.services.CourseService;
-import com.ead.course.specifications.CourseSpecs;
+import com.ead.course.specifications.SpecificationTemplate;
 import com.ead.course.validation.CourseValidator;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,25 +22,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 @Log4j2
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/courses")
 public class CourseController {
 
     private static final String COURSE_NOT_FOUND = "Course Not Found.";
 
-    @Autowired
-    private CourseService courseService;
-
-    @Autowired
-    private CourseValidator courseValidator;
+    private final CourseService courseService;
+    private final CourseValidator courseValidator;
 
     @PostMapping
     public ResponseEntity<Object> saveCourse(@RequestBody CourseDto courseDto, Errors errors) {
@@ -93,16 +87,9 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CourseModel>> getAllCourses(CourseFilter filter,
-                                                           @PageableDefault(sort = "courseId") Pageable pageable,
-                                                           @RequestParam(required = false) UUID userId) {
-        Specification<CourseModel> specification = CourseSpecs.usingFilter(filter);
-
-        if (Objects.nonNull(userId)) {
-            specification = specification.and(CourseSpecs.courseUserId(userId));
-        }
-
-        return ResponseEntity.ok(courseService.findAll(specification, pageable));
+    public ResponseEntity<Page<CourseModel>> getAllCourses(SpecificationTemplate.CourseSpec spec,
+                                                           @PageableDefault(sort = "courseId") Pageable pageable) {
+        return ResponseEntity.ok(courseService.findAll(spec, pageable));
     }
 
     @GetMapping("/{courseId}")

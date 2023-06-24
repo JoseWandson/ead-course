@@ -1,16 +1,15 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.LessonDto;
-import com.ead.course.filters.LessonFilter;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
-import com.ead.course.specifications.CourseSpecs;
+import com.ead.course.specifications.SpecificationTemplate;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -30,16 +29,14 @@ import java.util.UUID;
 
 @Log4j2
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/modules/{moduleId}/lessons")
 public class LessonController {
 
     private static final String LESSON_NOT_FOUND_FOR_THIS_MODULE = "Lesson not found for this module.";
 
-    @Autowired
-    private LessonService lessonService;
-
-    @Autowired
-    private ModuleService moduleService;
+    private final LessonService lessonService;
+    private final ModuleService moduleService;
 
     @PostMapping
     public ResponseEntity<Object> saveLesson(@PathVariable UUID moduleId,
@@ -92,10 +89,11 @@ public class LessonController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<LessonModel>> getAllLessons(@PathVariable UUID moduleId, LessonFilter filter,
+    public ResponseEntity<Page<LessonModel>> getAllLessons(@PathVariable UUID moduleId,
+                                                           SpecificationTemplate.LessonSpec spec,
                                                            @PageableDefault(sort = "lessonId") Pageable pageable) {
-        return ResponseEntity.ok(lessonService.findAll(CourseSpecs.lessonModuleId(moduleId)
-                .and(CourseSpecs.usingFilter(filter)), pageable));
+        return ResponseEntity
+                .ok(lessonService.findAllByModule(SpecificationTemplate.lessonModuleId(moduleId).and(spec), pageable));
     }
 
     @GetMapping("/{lessonId}")

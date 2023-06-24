@@ -3,7 +3,7 @@ package com.ead.course.services.impl;
 import com.ead.course.models.LessonModel;
 import com.ead.course.repositories.LessonRepository;
 import com.ead.course.services.LessonService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,10 +13,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class LessonServiceImpl implements LessonService {
 
-    @Autowired
-    private LessonRepository lessonRepository;
+    private final LessonRepository lessonRepository;
 
     @Override
     public LessonModel save(LessonModel lessonModel) {
@@ -35,6 +35,11 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public Page<LessonModel> findAll(Specification<LessonModel> spec, Pageable pageable) {
+        return lessonRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<LessonModel> findAllByModule(Specification<LessonModel> spec, Pageable pageable) {
         return lessonRepository.findAll(spec, pageable);
     }
 }

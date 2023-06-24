@@ -1,16 +1,15 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.ModuleDto;
-import com.ead.course.filters.ModuleFilter;
 import com.ead.course.models.CourseModel;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.services.ModuleService;
-import com.ead.course.specifications.CourseSpecs;
+import com.ead.course.specifications.SpecificationTemplate;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -30,16 +29,14 @@ import java.util.UUID;
 
 @Log4j2
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/courses/{courseId}/modules")
 public class ModuleController {
 
     private static final String MODULE_NOT_FOUND_FOR_THIS_COURSE = "Module not found for this course.";
 
-    @Autowired
-    private ModuleService moduleService;
-
-    @Autowired
-    private CourseService courseService;
+    private final ModuleService moduleService;
+    private final CourseService courseService;
 
     @PostMapping
     public ResponseEntity<Object> saveModule(@PathVariable UUID courseId,
@@ -92,10 +89,11 @@ public class ModuleController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ModuleModel>> getAllModules(@PathVariable UUID courseId, ModuleFilter filter,
+    public ResponseEntity<Page<ModuleModel>> getAllModules(@PathVariable UUID courseId,
+                                                           SpecificationTemplate.ModuleSpec spec,
                                                            @PageableDefault(sort = "moduleId") Pageable pageable) {
-        return ResponseEntity.ok(moduleService.findAll(CourseSpecs.moduleCourseId(courseId)
-                .and(CourseSpecs.usingFilter(filter)), pageable));
+        return ResponseEntity
+                .ok(moduleService.findAllByCourse(SpecificationTemplate.moduleCourseId(courseId).and(spec), pageable));
     }
 
     @GetMapping("/{moduleId}")
