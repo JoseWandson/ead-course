@@ -20,6 +20,8 @@ spring:
   output:
     ansi:
       enabled: Always
+  rabbitmq:
+    addresses:
 
 logging:
   level:
