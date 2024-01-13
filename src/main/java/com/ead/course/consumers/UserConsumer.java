@@ -25,8 +25,11 @@ public class UserConsumer {
     public void listenUserEvent(@Payload UserEventDto userEventDto) {
         var userModel = userEventDto.convertToUserModel();
 
-        if (ActionType.valueOf(userEventDto.getActionType()) == ActionType.CREATE) {
+        var actionType = ActionType.valueOf(userEventDto.getActionType());
+        if (actionType == ActionType.CREATE || actionType == ActionType.UPDATE) {
             userService.save(userModel);
+        } else if (actionType == ActionType.DELETE) {
+            userService.delete(userEventDto.getUserId());
         }
     }
 }
