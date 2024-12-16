@@ -25,13 +25,13 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/courses/")
+@RequestMapping("/courses/{courseId}/users")
 public class CourseUserController {
 
     private final CourseService courseService;
     private final UserService userService;
 
-    @GetMapping("{courseId}/users")
+    @GetMapping
     public ResponseEntity<Object> getAllUsersByCourse(SpecificationTemplate.UserSpec spec,
                                                       @PageableDefault(sort = "userId") Pageable pageable,
                                                       @PathVariable UUID courseId) {
@@ -42,7 +42,7 @@ public class CourseUserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course Not Found.");
     }
 
-    @PostMapping("{courseId}/users/subscription")
+    @PostMapping("/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable UUID courseId,
                                                                @RequestBody @Valid SubscriptionDto subscriptionDto) {
         Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
@@ -63,7 +63,7 @@ public class CourseUserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User is blocked.");
         }
 
-        courseService.saveSubscriptionUserInCourse(courseModelOptional.get().getCourseId(), userModelOptional.get().getUserId());
+        courseService.saveSubscriptionUserInCourseAndSendNotification(courseModelOptional.get(), userModelOptional.get());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Subscription created successfully.");
     }
